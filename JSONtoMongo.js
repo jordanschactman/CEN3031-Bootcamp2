@@ -13,6 +13,10 @@ var fs = require('fs'),
 //see https://mongoosejs.com/docs/connections.html
 //See https://docs.atlas.mongodb.com/driver-connection/
 
+mongoose.connect(config.db.uri, { useNewUrlParser: true });
+mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
+
 /* 
   Instantiate a mongoose model for each listing object in the JSON file, 
   and then save it to your Mongo database 
@@ -21,6 +25,71 @@ var fs = require('fs'),
   Remember that we needed to read in a file like we did in Bootcamp Assignment #1.
  */
 
+fs.readFile('listings.json', 'utf8', function(err, data) {
+
+  if (err) {
+    throw err;
+  }
+
+  var listings = JSON.parse(data).entries;
+
+  listings.forEach(function(element) {
+
+    Listing.findOne({ code: element.code }, function(err, listing) {
+
+      if (err) {
+        throw err;
+      }
+
+      if (listing) {
+
+        // update existing listing
+
+        listing.name = element.name;
+
+        if (element.coordinates) {
+          listing.coordinates = {
+            latitude: element.coordinates.latitude,
+            longitude: element.coordinates.longitude
+          };
+        }
+
+        if (element.address) {
+          listing.address = element.address;
+        }
+
+        listing.save();
+
+      }
+      else {
+
+        // create new listing
+
+        var newListing = new Listing({
+          code: element.code,
+          name: element.name
+        });
+
+        if (element.coordinates) {
+          newListing.coordinates = {
+            latitude: element.coordinates.latitude,
+            longitude: element.coordinates.longitude
+          };
+        }
+
+        if (element.address) {
+          newListing.address = element.address;
+        }
+
+        newListing.save();
+
+      }
+
+    });
+
+  });
+
+});
 
 /*  
   Check to see if it works: Once you've written + run the script, check out your MongoLab database to ensure that 
