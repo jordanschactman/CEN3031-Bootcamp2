@@ -58,7 +58,7 @@ var updatePhelpsLab = function() {
 
    */
 
-   Listing.findOneAndUpdate({ name: 'Phelps Laboratory' }, { address: '102 Phelps Lab, Gainesville, FL 32611, United States' }, { new: true }, function(err, listing) {
+   Listing.findOneAndUpdate({ name: 'Phelps Laboratory' }, { address: '1953 Museum Rd, Gainesville, FL 32603'}, { new: true }, function(err, listing) {
 
      if (err) {
        throw err;
